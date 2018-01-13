@@ -51,12 +51,15 @@ class SevensBoard extends Component {
     const hasValidMoves = this.hasValidMoves();
     let opacity = '0.5';
     if (!hasValidMoves) {
-      opacity = '1';
+      opacity = '0';
     } else if (isValidCard) {
-      opacity = '1';
+      opacity = '0';
     }
+    const hands = this.props.G.hands[this.props.ctx.currentPlayer];
     return (
-      <img
+      <div
+        className="hands-card"
+        key={cardName}
         onClick={() => {
           if (!hasValidMoves) {
             this.props.moves.discardCard(index);
@@ -71,15 +74,28 @@ class SevensBoard extends Component {
           }
         }}
         style={{
-          height: '35vh',
-          width: '24vh',
-          marginLeft: '-1.5rem',
-          opacity,
-        }}
-        src={Cards[cardName]}
-        alt={cardName}
-        key={cardName}
-      />
+          position: 'relative',
+        }}>
+        <div
+          style={{
+            position: 'absolute',
+            backgroundColor: 'black',
+            height: '35vh',
+            width: '24vh',
+            opacity,
+          }}
+        />
+        <img
+          style={{
+            zIndex: `${_.indexOf(hands, index)}`,
+            backgroundColor: 'white',
+            height: '35vh',
+            width: '24vh',
+          }}
+          src={Cards[cardName]}
+          alt={cardName}
+        />
+      </div>
     );
   };
 
@@ -88,9 +104,11 @@ class SevensBoard extends Component {
       const cardName = this.getCardName(val);
       return (
         <img
+          className="board-card"
           style={{
             height: '35vh',
             width: '24vh',
+            // marginTop: '-28vh',
           }}
           src={Cards[cardName]}
           alt={`board_${cardName}`}
@@ -107,7 +125,10 @@ class SevensBoard extends Component {
       if (boardCardType.length === 0) {
         return (
           <div
+            key={`lane_${type}`}
             style={{
+              marginLeft: '2rem',
+              marginRight: '2rem',
               border: '1px solid black',
               height: '35vh',
               width: '24vh',
@@ -117,7 +138,10 @@ class SevensBoard extends Component {
       }
       return (
         <div
+          key={`lane_${type}`}
           style={{
+            marginLeft: '2rem',
+            marginRight: '2rem',
             display: 'flex',
             flexDirection: 'column',
           }}>
@@ -130,6 +154,7 @@ class SevensBoard extends Component {
         style={{
           display: 'flex',
           flexDirection: 'row',
+          justifyContent: 'center',
         }}>
         {boardCard}
       </div>
@@ -144,10 +169,11 @@ class SevensBoard extends Component {
     return (
       <div
         style={{
+            width: '100%',
           display: 'flex',
           flexDirection: 'row',
           overflowX: 'auto',
-          paddingLeft: '2rem',
+          justifyContent: 'center',
         }}>
         {cardElements}
       </div>
@@ -162,7 +188,13 @@ class SevensBoard extends Component {
   };
   render() {
     return (
-      <div>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+          height: '100vh',
+        }}>
         {this.renderBoard()}
         {this.renderStatus()}
         {this.renderHands()}

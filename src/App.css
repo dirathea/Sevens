@@ -22,6 +22,22 @@
   font-size: large;
 }
 
+.board-card {
+  margin-top: -24vh
+}
+
+.board-card:first-of-type {
+  margin: 0
+}
+
+.hands-card {
+  margin-left: -18vh
+}
+
+.hands-card:first-of-type {
+  margin: 0
+}
+
 @keyframes App-logo-spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }

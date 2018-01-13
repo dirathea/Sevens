@@ -18,7 +18,6 @@ const SevensGame = Game({
       prev[index] = [];
       return prev;
     }, {});
-    console.log(discard);
     return {board, hands, valid, discard};
   },
   moves: {
@@ -32,10 +31,6 @@ const SevensGame = Game({
       const typeNumber = _.toInteger(card / 13);
       const type = CARD_TYPE[typeNumber];
       const currentBoardState = [...G.board[type]];
-      console.log(currentBoardState);
-      console.log(
-        `card is ${card} type is ${type}, card value is ${card % 13}`
-      );
       if (_.indexOf(G.valid, card) === -1) {
         return G;
       }
@@ -80,7 +75,6 @@ const SevensGame = Game({
       }
       return prev;
     }, []);
-    console.log(validMoves);
     return {
       board: G.board,
       hands: playerHand,
