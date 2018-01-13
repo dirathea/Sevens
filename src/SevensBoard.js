@@ -78,6 +78,10 @@ class SevensBoard extends Component {
         }}>
         <div
           style={{
+            borderTopLeftRadius: '5px',
+            borderTopRightRadius: '5px',
+            borderBottomLeftRadius: '5px',
+            borderBottomRightRadius: '5px',
             position: 'absolute',
             backgroundColor: 'black',
             height: '35vh',
@@ -169,7 +173,7 @@ class SevensBoard extends Component {
     return (
       <div
         style={{
-            width: '100%',
+          width: '100%',
           display: 'flex',
           flexDirection: 'row',
           overflowX: 'auto',
