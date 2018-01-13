@@ -6,7 +6,6 @@ const SevensGame = Client({
   game: Sevens,
   numPlayers: 4,
   board: SevensBoard,
-  multiplayer: true,
 });
 
 export default SevensGame;

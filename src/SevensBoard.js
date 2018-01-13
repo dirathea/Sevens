@@ -10,6 +10,18 @@ const Cards = CardAssets.keys().reduce((images, key) => {
 }, {});
 
 class SevensBoard extends Component {
+  state = {
+    hands: [],
+    hasValidMoves: false,
+  };
+
+  hasValidMoves = () => {
+    const diff = _.intersection(
+      this.props.G.valid,
+      this.props.G.hands[this.props.ctx.currentPlayer]
+    );
+    return diff.length > 0;
+  };
   getCardName = index => {
     const value = index % 13;
     const typeNumber = _.toInteger(index / 13);
@@ -35,15 +47,34 @@ class SevensBoard extends Component {
 
   getCard = index => {
     const cardName = this.getCardName(index);
+    const isValidCard = _.indexOf(this.props.G.valid, index) > -1;
+    const hasValidMoves = this.hasValidMoves();
+    let opacity = '0.5';
+    if (!hasValidMoves) {
+      opacity = '1';
+    } else if (isValidCard) {
+      opacity = '1';
+    }
     return (
       <img
         onClick={() => {
-          this.props.moves.playCard(index);
+          if (!hasValidMoves) {
+            this.props.moves.discardCard(index);
+            this.props.game.endTurn();
+          } else if (isValidCard) {
+            this.props.moves.playCard(index);
+            this.props.game.endTurn();
+          } else {
+            console.log(
+              `You are not allowed to play ${index} card since you have valid moves`
+            );
+          }
         }}
         style={{
           height: '35vh',
           width: '24vh',
           marginLeft: '-1.5rem',
+          opacity,
         }}
         src={Cards[cardName]}
         alt={cardName}
@@ -73,7 +104,6 @@ class SevensBoard extends Component {
   renderBoard = () => {
     const boardCard = Object.keys(this.props.G.board).map(type => {
       const boardCardType = this.props.G.board[type];
-      console.log(boardCardType.length);
       if (boardCardType.length === 0) {
         return (
           <div
@@ -107,7 +137,7 @@ class SevensBoard extends Component {
   };
 
   renderHands = () => {
-    const hands = this.props.G.hands;
+    const hands = this.props.G.hands[this.props.ctx.currentPlayer];
     const cardElements = hands.map(cardHand => {
       return this.getCard(cardHand);
     });
@@ -123,10 +153,18 @@ class SevensBoard extends Component {
       </div>
     );
   };
+
+  renderStatus = () => {
+    if (!this.hasValidMoves()) {
+      return <span>No valid move, please select card to discard</span>;
+    }
+    return null;
+  };
   render() {
     return (
       <div>
         {this.renderBoard()}
+        {this.renderStatus()}
         {this.renderHands()}
       </div>
     );

@@ -11,7 +11,15 @@ const SevensGame = Game({
       return prev;
     }, {});
     const hands = _.chunk(_.shuffle(_.range(0, 52)), 13);
-    return {board, hands};
+    const valid = CARD_TYPE.map((val, index) => {
+      return index * 13 + 6;
+    });
+    const discard = _.range(0, 4).reduce((prev, val, index) => {
+      prev[index] = [];
+      return prev;
+    }, {});
+    console.log(discard);
+    return {board, hands, valid, discard};
   },
   moves: {
     playCard(G, ctx, card) {
@@ -28,32 +36,15 @@ const SevensGame = Game({
       console.log(
         `card is ${card} type is ${type}, card value is ${card % 13}`
       );
-      if (currentBoardState.length !== 0) {
-        //  Adding card into not empty lane
-        const lowestCard = _.first(currentBoardState);
-        const highestCard = _.last(currentBoardState);
-        console.log(`valid moves is ${lowestCard - 1} or ${highestCard + 1}`);
-        if (lowestCard - card === 1) {
-          currentBoardState.unshift(card);
-          playerHands.splice(cardIndex, 1);
-        } else if (card - highestCard === 1) {
-          currentBoardState.push(card);
-          playerHands.splice(cardIndex, 1);
-        } else {
-          //  What's going on here?? invalid card to play actually.
-          return G;
-        }
-      } else {
-        //  The card must be 7 to added into board
-        const cardValue = card % 13;
-        if (cardValue % 6 === 0) {
-          currentBoardState.push(card);
-          playerHands.splice(cardIndex, 1);
-        }
+      if (_.indexOf(G.valid, card) === -1) {
+        return G;
       }
-      const updatedBoard = {...G.board, [type]: currentBoardState};
+      currentBoardState.push(card);
+      playerHands.splice(cardIndex, 1);
+      const updatedBoard = {...G.board, [type]: _.orderBy(currentBoardState)};
       const updatedHands = {...G.hands, [ctx.currentPlayer]: playerHands};
       return {
+          ...G,
         board: updatedBoard,
         hands: updatedHands,
       };
@@ -69,9 +60,12 @@ const SevensGame = Game({
         ...G.hands,
         [ctx.currentPlayer]: currentPlayerHands,
       };
+      const playerDiscard = [...G.discard[ctx.currentPlayer], card];
+      const updatedDiscard = {...G.discard, [ctx.currentPlayer]: playerDiscard};
       return {
         ...G,
         hands: updatedHands,
+        discard: updatedDiscard,
       };
     },
   },
@@ -94,7 +88,22 @@ const SevensGame = Game({
     };
   },
   flow: {
-    movesPerTurn: 1,
+    onTurnEnd: (G, ctx) => {
+      const validMoves = Object.keys(G.board).reduce((prev, curr) => {
+        const singleBoard = G.board[curr];
+        if (singleBoard.length === 0) {
+          prev.push(CARD_TYPE.indexOf(curr) * 13 + 6);
+        } else {
+          prev.push(_.first(singleBoard) - 1, _.last(singleBoard) + 1);
+        }
+        return prev;
+      }, []);
+      console.log(validMoves);
+      return {
+        ...G,
+        valid: validMoves,
+      };
+    },
   },
 });
 
